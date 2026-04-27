@@ -204,6 +204,17 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True}],
     )
 
+    trajectory_controller_spawner_1 = Node(
+    package="controller_manager",
+    executable="spawner",
+    arguments=[
+        "joint_trajectory_controller",
+        "--controller-manager",
+        "sweepee_1/controller_manager",
+    ],
+    parameters=[{"use_sim_time": True}],
+)
+
 
 ########## VISUALIZATION
 
@@ -286,7 +297,9 @@ def generate_launch_description():
         TimerAction(
             period=8.0,
             actions=[joint_state_broadcaster_spawner_1,
-                     position_controller_spawner_1]
+                     position_controller_spawner_1,
+                     #trajectory_controller_spawner_1
+                     ]
         ),
         TimerAction(
             period=7.0,
