@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+
+<robot name="mm1" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">
+
+  <xacro:arg name="omni" default="false" />
+
+  <xacro:if value="$(arg omni)">
+    <xacro:include filename="$(find lampo_description)/urdf/sweepee/sweepee_omni.xacro" />
+  </xacro:if>
+
+  <xacro:unless value="$(arg omni)">
+    <xacro:include filename="$(find lampo_description)/urdf/sweepee/sweepee_diff.xacro" />
+  </xacro:unless>
+
+  <xacro:arg name="name" default="ur"/>
+  <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
+
+  <xacro:arg name="ur_type" default="ur10"/>
+
+  <!-- parameters -->
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="prefix_rc" default="" />
+  <xacro:arg name="joint_limit_params" default="$(find ur_description)/config/$(arg ur_type)/joint_limits.yaml"/>
+  <xacro:arg name="kinematics_params" default="$(find ur_description)/config/$(arg ur_type)/default_kinematics.yaml"/>
+  <xacro:arg name="physical_params" default="$(find ur_description)/config/$(arg ur_type)/physical_parameters.yaml"/>
+  <xacro:arg name="visual_params" default="$(find ur_description)/config/$(arg ur_type)/visual_parameters.yaml"/>
+  <xacro:arg name="transmission_hw_interface" default=""/>
+  <xacro:arg name="safety_limits" default="false"/>
+  <xacro:arg name="safety_pos_margin" default="0.15"/>
+  <xacro:arg name="safety_k_position" default="20"/>
+  <!-- ros2_control related parameters -->
+  <xacro:arg name="headless_mode" default="false" />
+  <xacro:arg name="robot_ip" default="0.0.0.0" />
+  <xacro:arg name="script_filename" default=""/>
+  <xacro:arg name="output_recipe_filename" default=""/>
+  <xacro:arg name="input_recipe_filename" default=""/>
+  <!--   tool communication related parameters-->
+  <xacro:arg name="use_tool_communication" default="false" />
+  <xacro:arg name="tool_voltage" default="24" />
+  <xacro:arg name="tool_parity" default="0" />
+  <xacro:arg name="tool_baud_rate" default="115200" />
+  <xacro:arg name="tool_stop_bits" default="1" />
+  <xacro:arg name="tool_rx_idle_chars" default="1.5" />
+  <xacro:arg name="tool_tx_idle_chars" default="3.5" />
+  <xacro:arg name="tool_device_name" default="/tmp/ttyUR" />
+  <xacro:arg name="tool_tcp_port" default="54321" />
+
+    <!-- Simulation parameters -->
+  <xacro:arg name="sim_gazebo" default="false" />
+  <xacro:arg name="sim_gz" default="false" />
+  <xacro:arg name="mm" default="false" />
+  <xacro:arg name="simulation_controllers" default="error_default" />
+
+  <!-- initial position for simulations (Fake Hardware, Gazebo, Ignition) -->
+  <xacro:arg name="initial_positions_file" default="$(find ur_description)/config/initial_positions.yaml"/>
+
+  <!-- convert to property to use substitution in function -->
+  <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)"/>
+
+  <xacro:property name="M_PI" value="3.14159"/>
+
+  <xacro:sweepee  prefix="$(arg prefix)">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:sweepee>
+
+  <!-- <xacro:sweepee_gazebo /> -->
+
+
+   <!-- arm -->
+  <xacro:if value="$(arg mm)">
+    <xacro:ur_robot
+      name="$(arg name)"
+      tf_prefix="$(arg prefix)"
+      parent="$(arg prefix)base_footprint"
+      joint_limits_parameters_file="$(arg joint_limit_params)"
+      kinematics_parameters_file="$(arg kinematics_params)"
+      physical_parameters_file="$(arg physical_params)"
+      visual_parameters_file="$(arg visual_params)"
+      safety_limits="$(arg safety_limits)"
+      safety_pos_margin="$(arg safety_pos_margin)"
+      safety_k_position="$(arg safety_k_position)"
+      >
+      <origin xyz="0 0 0.4" rpy="0 0 0" />          
+    </xacro:ur_robot>
+  </xacro:if>
+
+
+  <xacro:if value="$(arg mm)">
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/shoulder_pan_joint</joint_name>
+        <topic>$(arg prefix_rc)/shoulder_pan_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>0</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/shoulder_lift_joint</joint_name>
+        <topic>$(arg prefix_rc)/shoulder_lift_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>-1</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/elbow_joint</joint_name>
+        <topic>$(arg prefix_rc)/elbow_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>0</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/wrist_1_joint</joint_name>
+        <topic>$(arg prefix_rc)/wrist_1_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>-1</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/wrist_2_joint</joint_name>
+        <topic>$(arg prefix_rc)/wrist_2_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>0</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>$(arg prefix_rc)/wrist_3_joint</joint_name>
+        <topic>$(arg prefix_rc)/wrist_3_joint</topic>
+        <p_gain>2000</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>200.00</d_gain>
+        <i_max>100000</i_max>
+        <i_min>-100000</i_min>
+        <cmd_max>100000000</cmd_max>
+        <cmd_min>-100000000</cmd_min>
+        <initial_position>0</initial_position>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin
+        filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
+        <topic>$(arg prefix_rc)/joint_states</topic>
+      </plugin>
+    </gazebo>
+
+    <ros2_control name="name" type="system">
+      <hardware>
+          <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
+          <param name="joint_commands_topic">joint_commands</param>
+          <param name="joint_states_topic">jnt_gz</param>
+          <param name="sum_wrapped_joint_states">false</param>
+      </hardware>
+
+      <joint name="$(arg prefix_rc)/shoulder_pan_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="$(arg prefix_rc)/shoulder_lift_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="$(arg prefix_rc)/elbow_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="$(arg prefix_rc)/wrist_1_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="$(arg prefix_rc)/wrist_2_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+
+      <joint name="$(arg prefix_rc)/wrist_3_joint">
+          <command_interface name="position"/>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+      </joint>
+    </ros2_control>
+
+  </xacro:if>
+
+
+</robot>
