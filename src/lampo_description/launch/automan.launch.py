@@ -297,8 +297,8 @@ def generate_launch_description():
         TimerAction(
             period=8.0,
             actions=[joint_state_broadcaster_spawner_1,
-                     position_controller_spawner_1,
-                     #trajectory_controller_spawner_1
+                     #position_controller_spawner_1,
+                     trajectory_controller_spawner_1
                      ]
         ),
         TimerAction(
