@@ -68,7 +68,7 @@
 
   <xacro:if value="$(arg mm)">
     <xacro:fake_camera prefix="$(arg prefix)" parent="$(arg prefix)tool0">
-      <origin xyz="0 0 0.05" rpy="0 0 0" />
+      <origin xyz="0 0 0.05" rpy="1.57 -1.57 1.57" />
     </xacro:fake_camera>
   </xacro:if>
 
@@ -101,7 +101,7 @@
         name="gz::sim::systems::JointPositionController">
         <joint_name>$(arg prefix_rc)/shoulder_pan_joint</joint_name>
         <topic>$(arg prefix_rc)/shoulder_pan_joint</topic>
-        <p_gain>2000</p_gain>
+        <p_gain>5000</p_gain>
         <i_gain>0.1</i_gain>
         <d_gain>200.00</d_gain>
         <i_max>100000</i_max>
@@ -118,7 +118,7 @@
         name="gz::sim::systems::JointPositionController">
         <joint_name>$(arg prefix_rc)/shoulder_lift_joint</joint_name>
         <topic>$(arg prefix_rc)/shoulder_lift_joint</topic>
-        <p_gain>2000</p_gain>
+        <p_gain>10000</p_gain>
         <i_gain>0.1</i_gain>
         <d_gain>200.00</d_gain>
         <i_max>100000</i_max>
@@ -135,7 +135,7 @@
         name="gz::sim::systems::JointPositionController">
         <joint_name>$(arg prefix_rc)/elbow_joint</joint_name>
         <topic>$(arg prefix_rc)/elbow_joint</topic>
-        <p_gain>2000</p_gain>
+        <p_gain>10000</p_gain>
         <i_gain>0.1</i_gain>
         <d_gain>200.00</d_gain>
         <i_max>100000</i_max>
@@ -186,7 +186,7 @@
         name="gz::sim::systems::JointPositionController">
         <joint_name>$(arg prefix_rc)/wrist_3_joint</joint_name>
         <topic>$(arg prefix_rc)/wrist_3_joint</topic>
-        <p_gain>2000</p_gain>
+        <p_gain>0</p_gain>
         <i_gain>0.1</i_gain>
         <d_gain>200.00</d_gain>
         <i_max>100000</i_max>
@@ -208,7 +208,7 @@
     <ros2_control name="name" type="system">
       <hardware>
           <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
-          <!-- <plugin>gazebo_ros2_control/GazeboSystem</plugin> -->
+          <!-- <plugin>gz_ros2_control/GazeboSimSystem</plugin> -->
           <param name="joint_commands_topic">joint_commands</param>
           <param name="joint_states_topic">jnt_gz</param>
           <param name="sum_wrapped_joint_states">false</param>

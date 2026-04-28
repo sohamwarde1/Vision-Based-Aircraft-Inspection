@@ -284,7 +284,7 @@ def generate_launch_description():
 
     nodes_to_start = [
         gazebo_server,
-        rviz_node,
+        #rviz_node,
         TimerAction(
             period=2.0,
             actions=[spawn_sweepee_1,robot_state_publisher_node_1],
