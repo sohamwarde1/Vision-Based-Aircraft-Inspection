@@ -63,6 +63,15 @@
     <origin xyz="0 0 0" rpy="0 0 0" />
   </xacro:sweepee>
 
+  <!-- Camera -->
+  <xacro:include filename="$(find lampo_description)/urdf/sweepee/camera.urdf.xacro"/>
+
+  <xacro:if value="$(arg mm)">
+    <xacro:fake_camera prefix="$(arg prefix)" parent="$(arg prefix)tool0">
+      <origin xyz="0 0 0.05" rpy="0 0 0" />
+    </xacro:fake_camera>
+  </xacro:if>
+
   <!-- <xacro:sweepee_gazebo /> -->
 
 

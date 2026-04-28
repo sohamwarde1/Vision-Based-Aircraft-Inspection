@@ -1,26 +1,23 @@
 <?xml version="1.0"?>
 <robot name="camera" xmlns:xacro="http://ros.org/wiki/xacro">
+<xacro:macro name="fake_camera" params="prefix parent *origin">
 
-<xacro:macro name="fake_camera" params="">
+  <xacro:macro name="box_inertia" params="m x y z">
+    <inertia ixx="${m*(y*y+z*z)/12}" ixy="0" ixz="0"
+             iyy="${m*(x*x+z*z)/12}" iyz="0"
+             izz="${m*(x*x+z*z)/12}" />
+  </xacro:macro>
 
-<xacro:macro name="box_inertia" params="m x y z">
-        <inertia  ixx="${m*(y*y+z*z)/12}" ixy = "0" ixz = "0"
-                  iyy="${m*(x*x+z*z)/12}" iyz = "0"
-                  izz="${m*(x*x+z*z)/12}" /> 
-</xacro:macro>
-
-  <!-- Camera Size -->
   <xacro:property name="cameraSize" value="0.03" />
   <xacro:property name="cameraMass" value="0.05" />
 
-  <link name="camera">
+  <link name="${prefix}camera">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <box size="${cameraSize} ${cameraSize} ${cameraSize}"/>
       </geometry>
     </collision>
-
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -28,21 +25,65 @@
       </geometry>
       <material name="blue"/>
     </visual>
-
     <inertial>
       <mass value="${cameraMass}" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <box_inertia m="${cameraMass}" x="${cameraSize}" y="${cameraSize}" z="${cameraSize}" />
+      <xacro:box_inertia m="${cameraMass}" x="${cameraSize}" y="${cameraSize}" z="${cameraSize}" />
     </inertial>
   </link>
 
-  <link name="camera_optical" />
-
-  <joint name="camera_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
-    <parent link="camera" />
-    <child link="camera_optical" />
+  <!-- Joint attaching camera to parent -->
+  <joint name="${prefix}camera_joint" type="fixed">
+    <xacro:insert_block name="origin" />
+    <parent link="${parent}" />
+    <child link="${prefix}camera" />
   </joint>
 
- </xacro:macro>
+  <link name="${prefix}camera_optical" />
+
+  <joint name="${prefix}camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+    <parent link="${prefix}camera" />
+    <child link="${prefix}camera_optical" />
+  </joint>
+
+  <!-- Gazebo camera sensor plugin -->
+  <gazebo reference="${prefix}camera">
+    <sensor name="${prefix}camera_sensor" type="camera">
+      <pose>0 0 0 0 0 0</pose>
+      <always_on>1</always_on>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+      <camera name="${prefix}camera">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin
+        filename="gz-sim-ros-camera-system"
+        name="gz::sim::systems::RosCamera">
+        <ros>
+          <remapping>~/image_raw:=camera/image_raw</remapping>
+          <remapping>~/camera_info:=camera/camera_info</remapping>
+        </ros>
+        <camera_name>${prefix}camera</camera_name>
+        <frame_name>${prefix}camera_optical</frame_name>
+        <hack_baseline>0</hack_baseline>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</xacro:macro>
 </robot>

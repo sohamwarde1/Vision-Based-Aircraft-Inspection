@@ -187,4 +187,20 @@
   subscriber_queue: 1       
   publisher_queue: 1        
   lazy: false               
-  direction: ROS_TO_GZ                        
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/world/empty/model/sweepee_1/link/sweepee_1/wrist_3_link/sensor/sweepee_1/camera_sensor/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/world/empty/model/sweepee_1/link/sweepee_1/wrist_3_link/sensor/sweepee_1/camera_sensor/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  subscriber_queue: 1
+  publisher_queue: 1
+  lazy: false
+  direction: GZ_TO_ROS                        
