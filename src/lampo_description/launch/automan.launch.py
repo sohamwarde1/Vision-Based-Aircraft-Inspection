@@ -218,7 +218,7 @@ def generate_launch_description():
 
 ########## VISUALIZATION
 
-    world_path = os.path.join(get_package_share_directory('lampo_description'),'worlds/empty.sdf')
+    world_path = os.path.join(get_package_share_directory('lampo_description'),'worlds/airplane.sdf')
 
     gazebo_server = GroupAction(
         actions=[
