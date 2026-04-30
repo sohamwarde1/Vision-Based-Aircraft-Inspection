@@ -2,4 +2,4 @@ build/
 install/
 log/
 bme_gazebo_basics/
-
+.venv

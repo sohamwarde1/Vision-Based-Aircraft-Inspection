@@ -11,13 +11,13 @@ from builtin_interfaces.msg import Duration
 
 # Joint positions for UP and DOWN states
 UP_POSITION = {
-    "sweepee_1/shoulder_lift_joint": -1.3,
-    "sweepee_1/elbow_joint": 1.3,
+    "sweepee_1/shoulder_lift_joint": -1.5,
+    "sweepee_1/elbow_joint": 0.3,
 }
 
 DOWN_POSITION = {
-    "sweepee_1/shoulder_lift_joint": -0.3,
-    "sweepee_1/elbow_joint": 0.0,
+    "sweepee_1/shoulder_lift_joint": -0.2,
+    "sweepee_1/elbow_joint": 0.6,
 }
 
 # All joints in the controller (non-moving joints hold at 0.0)
